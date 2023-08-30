@@ -38,7 +38,7 @@ const Navbar = () => {
   }, [router, search, searchParams]);
 
   return (
-    <header className="w-full bg-white border-b-[1px] border-black/10 padding max-h-18">
+    <header className="w-full border-b-[1px] border-black/10 padding max-h-18 bg-primary">
       <nav className="flex flex-row items-center justify-between gap-2 w-full">
         <div className="max-h-12 flex-3">
           <Link to={"#"}>
@@ -59,17 +59,17 @@ const Navbar = () => {
           />
         </div>
         <div className="flex-2 hidden 2xl:flex px-4 flex-row items-center justify-start gap-2">
-          <span className="font-normal">Topics: </span>
+          {/* <span className="font-semibold text-white text-xl">Topics: </span> */}
           <Sbtn title={"Science"} />
           <Sbtn title={"News"} />
           <Sbtn title={"Tech"} />
-          <Sbtn title={"Investments"} />
-          <Sbtn title={"Politics"} />
+          {/* <Sbtn title={"Investments"} />
+          <Sbtn title={"Politics"} /> */}
           <Sbtn title={"Others"} />
         </div>
-        <div className="flex-3">
+        {/* <div className="flex-3">
           <Btn title={"Write"} icon={BorderColorIcon} />
-        </div>
+        </div> */}
       </nav>
     </header>
   );

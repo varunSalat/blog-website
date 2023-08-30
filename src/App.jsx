@@ -1,4 +1,4 @@
-import { Outlet, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Footer, Navbar } from "./components";
 import { Listing, Article, Update } from "./pages";
 

@@ -1,6 +1,21 @@
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { Btn } from "../components";
+
+import { useState, useRef, useMemo } from 'react';
+import JoditEditor from 'jodit-react';
+
+const Example = ({ placeholder }) => {
+	const editor = useRef(null);
+
+	return (
+		<JoditEditor
+			ref={editor}
+			tabIndex={1}
+      config={{
+        height:"400px"
+      }}
+		/>
+	);
+};
 
 const Update = () => {
   const admin = true;
@@ -70,8 +85,8 @@ const Update = () => {
           placeholder="Summary of Article"
         />
       </div>
-      <div className="w-full xl:w-[1280px] h-[60vh]">
-        <ReactQuill className="h-full pb-8" />
+      <div className="w-full xl:w-[1280px] block">
+        <Example placeholder={"hi"} className="h-full pb-8" />
       </div>
       <div className="w-full xl:w-[1280px]">
         <Btn title="Post" />

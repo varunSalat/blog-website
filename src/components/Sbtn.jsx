@@ -38,7 +38,7 @@ const Sbtn = ({ title }) => {
   return (
     <div
       onClick={handleClick}
-      className="px-6 py-2 bg-black/5 text-md font-semibold rounded-full cursor-pointer"
+      className="px-6 py-2 bg-gray-100 text-md font-semibold rounded-full cursor-pointer"
     >
       <span>{title}</span>
     </div>
