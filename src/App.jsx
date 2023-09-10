@@ -1,6 +1,6 @@
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Footer, Navbar } from "./components";
-import { Listing, Article, Update } from "./pages";
+import { Listing, Article, Update, EditBlog } from "./pages";
 
 // outlet setup
 
@@ -14,6 +14,7 @@ const Elem = (
 
 const router = createBrowserRouter([
   {
+    basename: "/",
     path: "/",
     element: Elem,
     children: [
@@ -22,26 +23,20 @@ const router = createBrowserRouter([
         element: <Listing />,
       },
       {
-        path: "/a",
+        path: "/a/:blogUrl",
         element: <Article />,
       },
       {
         path: "/update",
         element: <Update />,
       },
+      {
+        path: "/e/:blogUrl",
+        element: <EditBlog />,
+      },
     ],
   },
 ]);
-
-// const router = createBrowserRouter(createRoutesFromElements(
-//   <Route path="/" >
-//     <Route index element={<Listing/>}/>
-//     <Route path="a" element={<Article/>}/>
-//     <Route path="update" element={<Update/>}/>
-//   </Route>
-// ));
-
-
 
 function App() {
   return <RouterProvider router={router} />;

@@ -1,75 +1,148 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import Btn from "./Btn";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import Sbtn from "./Sbtn";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import qs from "query-string";
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
+import { logo } from "../assets";
 
 const Navbar = () => {
   const [search, setSearch] = useState("");
+  const [navOpen, setNavOpen] = useState(false);
   const router = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const handleSearch = useCallback(() => {
-    let q = {};
+  const handleSearch = useCallback(
+    (e) => {
+      e.preventDefault();
+      let q = {};
 
-    if (searchParams) {
-      q = qs.parse(searchParams.toString());
-    }
+      if (searchParams) {
+        q = qs.parse(searchParams.toString());
+      }
 
-    const updatedQuery = {
-      ...q,
-      s: search,
-    };
+      const updatedQuery = {
+        ...q,
+        s: search,
+      };
 
-    if (searchParams?.get("s")) {
-      delete updatedQuery.s;
-    }
-    const url = qs.stringifyUrl(
+      if (searchParams?.get("s") == "") {
+        delete updatedQuery.s;
+      }
+      const url = qs.stringifyUrl(
+        {
+          url: "/",
+          query: updatedQuery,
+        },
+        { skipNull: true }
+      );
+
+      router(url);
+    },
+    [router, search, searchParams]
+  );
+
+  useEffect(() => {
+    navOpen
+      ? (document.querySelector("body").style.overflowY = "hidden")
+      : (document.querySelector("body").style.overflowY = "scroll");
+  }, [navOpen]);
+
+  const handleNavOpen = () => {
+    window.history.pushState(
       {
-        url: "/",
-        query: updatedQuery,
+        id: 1,
       },
-      { skipNull: true }
+      null,
+      null
     );
-
-    router(url);
-  }, [router, search, searchParams]);
+    setNavOpen(true);
+  };
+  window.addEventListener("popstate", () => {
+    setNavOpen(false);
+    document.querySelector("body").style.overflowY = "scroll";
+  });
 
   return (
     <header className="w-full border-b-[1px] border-black/10 padding max-h-18 bg-primary">
       <nav className="flex flex-row items-center justify-between gap-2 w-full">
         <div className="max-h-12 flex-3">
-          <Link to={"#"}>
-            <img src="./logo.png" alt="Logo" className="object-cover h-12" />
+          <Link to={"/"}>
+            <img src={logo} alt="Logo" className="object-cover h-6 md:h-9" />
           </Link>
         </div>
-        <div className="flex-2 relative hidden md:block">
+        <button className="xl:hidden" onClick={() => handleNavOpen()}>
+          <MenuIcon style={{ fontSize: "2rem" }} />
+        </button>
+        <div className="flex-2 relative hidden xl:block w-[min(700px,100%)]">
           <SearchIcon
             className="absolute top-[10px] right-[10px] text-black/20"
             onClick={handleSearch}
           />
-          <input
-            type="text"
-            className="px-8 py-2 border-black/10 border-2 rounded-full w-96 focus:outline-none font-medium"
-            placeholder="Search you're favourite article!"
-            onChange={(v) => setSearch(v.target.value)}
-            value={search}
-          />
+          <form action="" onSubmit={handleSearch}>
+            <input
+              type="text"
+              className="px-8 py-2 border-black/10 border-2 rounded-full w-[100%] focus:outline-none font-medium"
+              placeholder="Search you're favourite article!"
+              onChange={(v) => setSearch(v.target.value)}
+              value={search}
+            />
+          </form>
         </div>
         <div className="flex-2 hidden 2xl:flex px-4 flex-row items-center justify-start gap-2">
-          {/* <span className="font-semibold text-white text-xl">Topics: </span> */}
-          <Sbtn title={"Science"} />
+          <Sbtn title={"Finance"} />
           <Sbtn title={"News"} />
           <Sbtn title={"Tech"} />
-          {/* <Sbtn title={"Investments"} />
-          <Sbtn title={"Politics"} /> */}
           <Sbtn title={"Others"} />
         </div>
         {/* <div className="flex-3">
           <Btn title={"Write"} icon={BorderColorIcon} />
         </div> */}
+
+        {navOpen && (
+          <div className="fixed bg-primary xl:hidden top-0 left-0 w-screen min-h-[200vh]">
+            <div className="flex w-screen items-center justify-end px-4 h-[80px]">
+              <button onClick={() => setNavOpen(false)}>
+                <CloseIcon style={{ fontSize: "2rem" }} />
+              </button>
+            </div>
+            <h1 className="text-center text-2xl mt-[5%]">Hot Topics</h1>
+            <div className="flex flex-wrap gap-6 justify-center mt-2 w-screen p-6">
+              <Sbtn title={"Science"} />
+              <Sbtn title={"News"} />
+              <Sbtn title={"Tech"} />
+              <Sbtn title={"Others"} />
+            </div>
+
+            <div className="flex-2 relative w-[90%] ml-[5%] mt-4">
+              <SearchIcon
+                className="absolute top-[10px] right-[10px] text-black/20"
+                onClick={handleSearch}
+                style={{ fontSize: "1.5rem" }}
+              />
+              <input
+                type="text"
+                className="px-8 py-2 border-black/10 border-2 rounded-full w-[100%] focus:outline-none font-medium text-base sm:text-2xl"
+                placeholder="Search you're favourite article!"
+                onChange={(v) => setSearch(v.target.value)}
+                value={search}
+              />
+              <button
+                type="submit"
+                className="bg-black text-white mt-4 px-6 py-2 w-[90%] text-base rounded-3xl ml-[5%]"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );

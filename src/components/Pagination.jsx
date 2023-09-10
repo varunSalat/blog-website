@@ -4,12 +4,16 @@ import { useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import qs from "query-string";
 
-const Pagination = () => {
+const Pagination = ({totalBlogs}) => {
   const router = useNavigate();
   const [searchParams] = useSearchParams();
+  
+   const currentPage = parseInt(searchParams.get("page"))||1;
+   const totalPage = Math.ceil(totalBlogs/10);
+
   const onBack = useCallback(() => {
     let q = {};
-    if (searchParams) {
+    if (searchParams) { 
       q = qs.parse(searchParams.toString());
     }
     if (!(searchParams?.get("page") > 1)) {
@@ -57,17 +61,22 @@ const Pagination = () => {
 
   return (
     <div className="flex flex-row justify-center items-center gap-4">
-      <ArrowBackIcon
+      <button disabled={currentPage===1}>
+          <ArrowBackIcon
         fontSize="large"
-        className="p-2 bg-gray-200 rounded-md cursor-pointer"
+        className={`p-2 rounded-md ${currentPage===1?"bg-gray-200":"bg-gray-400"}`}
         onClick={onBack}
       />
-      <span className="text-lg text-gray-500 font-bold">1</span>
-      <ArrowForwardIcon
+      </button>
+      <span className="text-lg text-gray-500 font-bold">{currentPage===0?"1":currentPage}</span>
+      <button disabled={totalBlogs!==0?currentPage - totalPage===0:true}>
+        <ArrowForwardIcon
         fontSize="large"
-        className="p-2 bg-gray-200 rounded-md cursor-pointer"
+        className={`p-2 rounded-md ${totalBlogs!==0?currentPage - totalPage===0?"bg-gray-200":"bg-gray-400":"bg-gray-200"}`}
         onClick={onNext}
+        disabled
       />
+      </button>
     </div>
   );
 };

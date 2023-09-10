@@ -1,8 +1,10 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { Btn } from "../components";
 import JoditEditor from "jodit-react";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
+import Loader from "../layouts/Loader";
+import { useParams } from "react-router-dom";
 
 const Example = ({ onBlur, value }) => {
   const editor = useRef(null);
@@ -18,66 +20,66 @@ const Example = ({ onBlur, value }) => {
   );
 };
 
-const Update = () => {
+const EditBlog = () => {
   const { login, user } = useContext(UserContext);
+  const { blogUrl } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [blog, setBlog] = useState("");
-  const [formData, setFormData] = useState({
-    title: "",
-    summary: "",
-    img: "",
-    cat: "",
-    url: "",
-    mostViewed: false,
-  });
-
+  const [formData, setFormData] = useState(null);
+  const [blog, setBlog] = useState(null);
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
   });
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8800/api/blog/${blogUrl}`
+        );
+        setFormData(response.data.blog); // Set the data state with the fetched data
+        setBlog(response.data.blog.blog);
+        setIsLoading(false); // Set loading state to false when data is available
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false); // Set loading state to false in case of an error
+      }
+    };
+    fetchData();
+  }, [blogUrl]);
+  console.log(formData);
   const handleInputChange = (e) => {
-    if (e.target.name === "title") {
-      const title =
-        e.target.value.replace(/ /g, "-") + "-" + new Date().getSeconds();
-      const lowerTitle = title.toLowerCase();
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-        url: lowerTitle,
-      });
-    } else if (e.target.name === "mostViewed") {
+    if (e.target.name === "mostViewed") {
       setFormData({ ...formData, [e.target.name]: e.target.checked });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
+  const handleChecked = (e) => {
+    setFormData({ ...formData, isMostViewed: e.target.checked });
+  };
 
   const handleSubmit = async () => {
-    await axios
+    const newBlog = await axios
       .post(
-        "http://localhost:8800/api/create",
-        { ...formData, blog },
+        "http://localhost:8800/api/edit",
+        { ...formData, blog: blog },
         { withCredentials: true }
       )
-      .then(() => {
-        setFormData({
-          ...formData,
-          title: "",
-          summary: "",
-          img: "",
-          cat: "",
-          mostViewed: false,
-          url: "",
-        }),
-          setBlog("");
-      })
       .catch((err) => console.log(err));
+
+    console.log(newBlog);
   };
 
   const handleLogin = async () => {
     await login(loginData);
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
+  console.log(formData.mostViewed);
 
   if (user === null) {
     return (
@@ -121,7 +123,7 @@ const Update = () => {
     <section className="padding flex flex-col items-center justify-center gap-4 ">
       <div className="w-full xl:w-[1280px]">
         <h1 className="text-center text-2xl font-bold p-4 uppercase">
-          Creating Article
+          Editing Article
         </h1>
       </div>
       <div className="w-full xl:w-[1280px]">
@@ -178,9 +180,9 @@ const Update = () => {
           type="checkbox"
           className="border-black/20 border-2 rounded-md p-2 w-[40px]"
           name="mostViewed"
-          checked={formData.mostViewed}
+          checked={formData.isMostViewed}
           id="mostViewed"
-          onChange={(e) => handleInputChange(e)}
+          onChange={(e) => handleChecked(e)}
         />
       </div>
       <div className="w-full xl:w-[1280px] h-full block">
@@ -192,10 +194,10 @@ const Update = () => {
         />
       </div>
       <div className="w-full xl:w-[1280px]">
-        <Btn title="Post" onClick={handleSubmit} />
+        <Btn title="Edit Blog" onClick={handleSubmit} />
       </div>
     </section>
   );
 };
 
-export default Update;
+export default EditBlog;
