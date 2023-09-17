@@ -13,9 +13,13 @@ export const UserProvider = ({ children }) => {
   };
 
   const login = async (i) => {
-    const res = await axios.post("http://localhost:8800/api/login", i, {
-      withCredentials: true,
-    });
+    const res = await axios.post(
+      "https://blog-website-g6cd.onrender.com/login",
+      i,
+      {
+        withCredentials: true,
+      }
+    );
     setUser(res.data);
   };
 

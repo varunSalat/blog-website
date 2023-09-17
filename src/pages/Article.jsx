@@ -64,12 +64,16 @@ const Article = () => {
   };
 
   const handleLikeBlog = async (blogId) => {
-    const res = await axios.post(`http://localhost:8800/api/like/${blogId}`);
+    const res = await axios.post(
+      `https://blog-website-g6cd.onrender.com/api/like/${blogId}`
+    );
     console.log(res);
   };
 
   const handleDislikeBlog = async (blogId) => {
-    const res = await axios.post(`http://localhost:8800/api/dislike/${blogId}`);
+    const res = await axios.post(
+      `https://blog-website-g6cd.onrender.com/api/dislike/${blogId}`
+    );
     console.log(res);
   };
 
@@ -126,7 +130,7 @@ const Article = () => {
             <article className="text-lg text-gray-400 font-medium flex flex-col gap-4">
               {parse(dataVar?.blog)}
             </article>
-            <div className="border-t-2 w-full border-black/20">
+            {/* <div className="border-t-2 w-full border-black/20">
               <div className="flex justify-center items-center gap-4 mt-6">
                 <p className="text-xl text-gray-500">Was it helpful?</p>
                 <div className="flex gap-2">
@@ -140,7 +144,7 @@ const Article = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </section>
         </div>
       )}

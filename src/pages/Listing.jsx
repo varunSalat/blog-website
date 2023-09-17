@@ -28,7 +28,10 @@ const fetchFunc = async (searchParams) => {
   } else {
     delete query.cat;
   }
-  const response = await axios.post("http://localhost:8800/api/blog", query);
+  const response = await axios.post(
+    "https://blog-website-g6cd.onrender.com/api/blog",
+    query
+  );
   return response.data;
 };
 

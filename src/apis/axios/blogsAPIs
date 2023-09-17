@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "http://localhost:8800/";
+const baseURL = "https://blog-website-g6cd.onrender.com";
 
 const listingAPI = axios.create({
   baseURL,
