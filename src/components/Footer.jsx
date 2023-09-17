@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -25,11 +24,25 @@ const Footer = () => {
         </span>
       </div>
       <div className="flex flex-row gap-4 items-center justify-center">
-        <Link className="text-gray-200 transition-all duration-300 hover:text-white">Terms of Use</Link>
-        <Link className="text-gray-200 transition-all duration-300 hover:text-white">Privacy Policy</Link>
-        <Link className="text-gray-200 transition-all duration-300 hover:text-white">Site Map</Link>
+        <Link
+          to={"/term-condition"}
+          className="text-gray-200 transition-all duration-300 hover:text-white"
+        >
+          Terms of Use
+        </Link>
+        <Link
+          to={"/privacy-policy"}
+          className="text-gray-200 transition-all duration-300 hover:text-white"
+        >
+          Privacy Policy
+        </Link>
+        <Link className="text-gray-200 transition-all duration-300 hover:text-white">
+          Site Map
+        </Link>
       </div>
-      <span className="text-white" >Copyright © 2023 - 2023 xyzcompany. All rights reserved</span>
+      <span className="text-white">
+        Copyright © 2023 - 2023 xyzcompany. All rights reserved
+      </span>
     </footer>
   );
 };

@@ -1,8 +1,20 @@
 import axios from "axios";
 
-export const listingAPI = axios.create({
-  baseURL: "http://localhost:8800/",
+const baseURL = "http://localhost:8800/";
+
+const listingAPI = axios.create({
+  baseURL,
   headers: {
     Accept: "application/json",
   },
 });
+
+const apiWithAuth = axios.create({
+  baseURL,
+  headers: {
+    Accept: "application/json",
+  },
+  withCredentials: true,
+});
+
+export { listingAPI, apiWithAuth };

@@ -1,3 +1,3 @@
 import logo from "./logo.svg";
-
-export { logo };
+import fallbackImg from "./fallbackImg.svg";
+export { logo, fallbackImg };

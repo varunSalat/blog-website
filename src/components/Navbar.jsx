@@ -1,10 +1,4 @@
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import Sbtn from "./Sbtn";
 import { useCallback, useEffect, useState } from "react";
@@ -21,6 +15,7 @@ const Navbar = () => {
 
   const handleSearch = useCallback(
     (e) => {
+      setNavOpen(false);
       e.preventDefault();
       let q = {};
 
@@ -86,7 +81,7 @@ const Navbar = () => {
             className="absolute top-[10px] right-[10px] text-black/20"
             onClick={handleSearch}
           />
-          <form action="" onSubmit={handleSearch}>
+          <form onSubmit={handleSearch}>
             <input
               type="text"
               className="px-8 py-2 border-black/10 border-2 rounded-full w-[100%] focus:outline-none font-medium"
@@ -98,13 +93,10 @@ const Navbar = () => {
         </div>
         <div className="flex-2 hidden 2xl:flex px-4 flex-row items-center justify-start gap-2">
           <Sbtn title={"Finance"} />
-          <Sbtn title={"News"} />
+          <Sbtn title={"Education"} />
           <Sbtn title={"Tech"} />
           <Sbtn title={"Others"} />
         </div>
-        {/* <div className="flex-3">
-          <Btn title={"Write"} icon={BorderColorIcon} />
-        </div> */}
 
         {navOpen && (
           <div className="fixed bg-primary xl:hidden top-0 left-0 w-screen min-h-[200vh]">
@@ -115,10 +107,10 @@ const Navbar = () => {
             </div>
             <h1 className="text-center text-2xl mt-[5%]">Hot Topics</h1>
             <div className="flex flex-wrap gap-6 justify-center mt-2 w-screen p-6">
-              <Sbtn title={"Science"} />
-              <Sbtn title={"News"} />
-              <Sbtn title={"Tech"} />
-              <Sbtn title={"Others"} />
+              <Sbtn title={"Science"} setNavOpen={setNavOpen} />
+              <Sbtn title={"Education"} setNavOpen={setNavOpen} />
+              <Sbtn title={"Tech"} setNavOpen={setNavOpen} />
+              <Sbtn title={"Others"} setNavOpen={setNavOpen} />
             </div>
 
             <div className="flex-2 relative w-[90%] ml-[5%] mt-4">
@@ -127,16 +119,19 @@ const Navbar = () => {
                 onClick={handleSearch}
                 style={{ fontSize: "1.5rem" }}
               />
-              <input
-                type="text"
-                className="px-8 py-2 border-black/10 border-2 rounded-full w-[100%] focus:outline-none font-medium text-base sm:text-2xl"
-                placeholder="Search you're favourite article!"
-                onChange={(v) => setSearch(v.target.value)}
-                value={search}
-              />
+              <form onSubmit={handleSearch}>
+                <input
+                  type="text"
+                  className="px-8 py-2 border-black/10 border-2 rounded-full w-[100%] focus:outline-none font-medium"
+                  placeholder="Search you're favourite article!"
+                  onChange={(v) => setSearch(v.target.value)}
+                  value={search}
+                />
+              </form>
               <button
                 type="submit"
                 className="bg-black text-white mt-4 px-6 py-2 w-[90%] text-base rounded-3xl ml-[5%]"
+                onClick={(e) => handleSearch(e)}
               >
                 Search
               </button>

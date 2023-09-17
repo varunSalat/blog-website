@@ -1,9 +1,10 @@
 import { useState, useRef, useContext } from "react";
+import PropTypes from "prop-types";
 import { Btn } from "../components";
 import JoditEditor from "jodit-react";
-import axios from "axios";
 import { UserContext } from "../context/UserContext";
-
+import { apiWithAuth } from "../apis/axios/blogsAPIs";
+import { errorToast, successToast } from "../constants/toastMsgs";
 const Example = ({ onBlur, value }) => {
   const editor = useRef(null);
 
@@ -36,6 +37,8 @@ const Update = () => {
     password: "",
   });
 
+  const [isPosting, setIsPosting] = useState(false);
+
   const handleInputChange = (e) => {
     if (e.target.name === "title") {
       const title =
@@ -54,13 +57,9 @@ const Update = () => {
   };
 
   const handleSubmit = async () => {
-    await axios
-      .post(
-        "http://localhost:8800/api/create",
-        { ...formData, blog },
-        { withCredentials: true }
-      )
-      .then(() => {
+    try {
+      setIsPosting(true);
+      await apiWithAuth.post("api/create", { ...formData, blog }).then(() => {
         setFormData({
           ...formData,
           title: "",
@@ -71,8 +70,13 @@ const Update = () => {
           url: "",
         }),
           setBlog("");
-      })
-      .catch((err) => console.log(err));
+      });
+      setIsPosting(false);
+      successToast("Blog posted successfully");
+    } catch (error) {
+      errorToast(error.message);
+      setIsPosting(false);
+    }
   };
 
   const handleLogin = async () => {
@@ -165,7 +169,7 @@ const Update = () => {
             Select your category
           </option>
           <option value="Finance">Finance</option>
-          <option value="News">News</option>
+          <option value="Education">Education</option>
           <option value="Tech">Tech</option>
           <option value="Others">Others</option>
         </select>
@@ -192,10 +196,19 @@ const Update = () => {
         />
       </div>
       <div className="w-full xl:w-[1280px]">
-        <Btn title="Post" onClick={handleSubmit} />
+        <button
+          className="px-6 py-2 text-md font-semibold border-black/10 border-2 rounded-xl flex flex-row items-center justify-center transition-all duration-300 hover:bg-green-500 hover:text-white"
+          onClick={handleSubmit}
+        >
+          <span>{isPosting ? "Blog Posting" : "Blog Post"}</span>
+        </button>
       </div>
     </section>
   );
+};
+Example.propTypes = {
+  value: PropTypes.string,
+  onBlur: PropTypes.func,
 };
 
 export default Update;

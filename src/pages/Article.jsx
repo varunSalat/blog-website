@@ -1,4 +1,4 @@
-import { Btn, MostViewedCard } from "../components";
+import { Btn } from "../components";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
@@ -9,58 +9,58 @@ import parse from "html-react-parser";
 import { UserContext } from "../context/UserContext";
 import Loader from "../layouts/Loader";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { listingAPI } from "../apis/axios/blogsAPIs";
+import { useQuery } from "react-query";
+import { fallbackImg } from "../assets";
+import { apiWithAuth } from "../apis/axios/blogsAPIs";
+import { errorToast, successToast } from "../constants/toastMsgs";
+import toast from "react-hot-toast";
+
+const fetchBlog = (blogUrl) => {
+  return listingAPI(`/api/blog/${blogUrl}`);
+};
 
 const Article = () => {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const { blogUrl } = useParams();
-  const [data, setData] = useState(null); // Initialize data as a state variable
-  const [isLoading, setIsLoading] = useState(true); // Initialize loading state
+  const [isImgLoading, setIsImgLoading] = useState(true);
+  const [isImgErr, setIsImgErr] = useState(false);
 
-  // const fetchNewData = () => {
-  //   return axios(`http://localhost:8800/api/blog/${blogUrl}`);
-  // };
+  const blogRes = useQuery(["blog-detail", blogUrl], () => fetchBlog(blogUrl));
 
-  // const res = useQuery(["blog-detail", blogUrl], fetchNewData, {
-  //   cacheTime: 1000 * 6000,
-  // });
-
+  const { isLoading, data } = blogRes;
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8800/api/blog/${blogUrl}`
-        );
-        setData(response.data); // Set the data state with the fetched data
-        setIsLoading(false); // Set loading state to false when data is available
-      } catch (error) {
-        console.error(error);
-        setIsLoading(false); // Set loading state to false in case of an error
-      }
-    };
-    fetchData();
-  }, [blogUrl]);
+    document.title = `Scholarwithtech | blog website | ${data?.data.blog.cat}`;
+    // changing meta description
+    const description = data?.data?.blog?.title.slice(0, 155) || "";
+    const metaDescription = document.createElement("meta");
+    metaDescription.name = "description";
+    metaDescription.content = description;
+  }, [data]);
 
   // delete blog
 
   const handleDeleteBlog = async (blogId) => {
-    await axios
-      .delete(`http://localhost:8800/api/blog/${blogId}`, {
-        withCredentials: true,
-      })
-      .then(() => {
-        return navigate("/");
-      });
+    try {
+      await apiWithAuth.delete(`/api/blog/${blogId}`);
+      navigate("/");
+      successToast("Blog is deleted successfully");
+    } catch (error) {
+      errorToast(error.message);
+    }
   };
 
-  // Time Func
-  const formatedTime = (timestamp) => {
-    const options = { year: "2-digit", month: "long", day: "numeric" };
-    const formattedDate = new Date(timestamp).toLocaleDateString(
-      undefined,
-      options
-    );
-    return formattedDate;
+  const handleDeleteConfirmation = () => {
+    const confirmed = window.confirm("Are you sure you want to delete this?");
+
+    if (confirmed) {
+      handleDeleteBlog(data?.data?.blog?._id);
+    } else {
+      toast("Your blog is not deleted", {
+        icon: "😇",
+      });
+    }
   };
 
   const handleLikeBlog = async (blogId) => {
@@ -73,92 +73,77 @@ const Article = () => {
     console.log(res);
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
-  const { title, img, summary, blog, createdAt, dislike, like, url } =
-    data.blog;
+  const dataVar = data?.data?.blog;
+
   return (
     <>
-      <div className="grid md:grid-cols-12">
-        <div className="col-span-2"></div>
-        <section className="flex flex-col justify-center items-center gap-4 padding md:col-span-8">
-          <div className="flex flex-col justify-center items-center">
-            <img
-              src={data.img}
-              alt="Profile Pic"
-              className="h-20 w-20 rounded-full object-cover"
-            />
-            <h4 className="font-semibold text-base">{data.name}</h4>
-            <time className="font-light text-sm text-gray-400">
-              {formatedTime(createdAt)}
-            </time>
-          </div>
-          {user && (
-            <div className="flex gap-4">
-              <Btn
-                title={"Edit"}
-                icon={BorderColorIcon}
-                onClick={() => navigate(`/e/${url}`)}
+      {isLoading && <Loader />}
+      {!isLoading && (
+        <div className="grid md:grid-cols-12">
+          <div className="col-span-2"></div>
+          <section className="flex flex-col justify-center items-center gap-4 padding md:col-span-8">
+            {/* <div className="flex flex-col justify-center items-center">
+              <img
+                src={data?.data?.img}
+                alt={data?.data?.name}
+                className="h-20 w-20 rounded-full object-cover"
               />
-              <button
-                onClick={() => handleDeleteBlog(data.blog._id)}
-                className="px-6 py-2 text-md font-semibold border-black/10 border-2 rounded-xl flex flex-row items-center justify-center transition-all duration-300 hover:bg-red-400 hover:text-white"
-              >
-                <DeleteIcon /> Delete
-              </button>
-            </div>
-          )}
-          <h1 className="text-2xl text-justify md:text-3xl font-bold">
-            {title}
-          </h1>
-          <h3 className="text-lg font-semibold text-gray-500">{summary}</h3>
-          <img
-            src={img}
-            alt=""
-            className="object-cover rounded-xl border-black/20 border-2"
-          />
-          <article className="text-lg text-gray-400 font-medium flex flex-col gap-4">
-            {parse(blog)}
-          </article>
-          <div className="border-t-2 w-full border-black/20">
-            <div className="flex justify-center items-center gap-4 mt-6">
-              <p className="text-xl text-gray-500">Was it helpful?</p>
-              <div className="flex gap-2">
-                <button onClick={() => handleLikeBlog(data.blog._id)}>
-                  <ThumbUpOffAltIcon style={{ fontSize: "2rem" }} />
-                  <p>{like}</p>
-                </button>
-                <button onClick={() => handleDislikeBlog(data.blog._id)}>
-                  <ThumbDownOffAltIcon style={{ fontSize: "2rem" }} />
-                  <p>{dislike}</p>
+              <h4 className="font-semibold text-base">{"test"}</h4>
+              <time className="font-light text-sm text-gray-400">
+                {data?.data?.name}
+              </time>
+            </div> */}
+            {user && (
+              <div className="flex gap-4">
+                <Btn
+                  title={"Edit"}
+                  icon={BorderColorIcon}
+                  onClick={() => navigate(`/e/${data?.data?.blog?.url}`)}
+                />
+                <button
+                  onClick={handleDeleteConfirmation}
+                  className="px-6 py-2 text-md font-semibold border-black/10 border-2 rounded-xl flex flex-row items-center justify-center transition-all duration-300 hover:bg-red-400 hover:text-white"
+                >
+                  <DeleteIcon /> Delete
                 </button>
               </div>
+            )}
+            <h1 className="text-2xl text-justify md:text-3xl font-bold">
+              {data?.data?.blog?.title}
+            </h1>
+            <h3 className="text-lg font-semibold text-gray-500">
+              {data?.data?.blog?.summary}
+            </h3>
+            <img
+              src={
+                isImgErr || isImgLoading ? fallbackImg : data?.data?.blog?.img
+              }
+              alt={data?.data?.blog?.title}
+              className="object-cover min-h-[200px] w-full rounded-xl border-black/20 border-2"
+              onError={() => setIsImgErr(true)}
+              onLoad={() => setIsImgLoading(false)}
+            />
+            <article className="text-lg text-gray-400 font-medium flex flex-col gap-4">
+              {parse(dataVar?.blog)}
+            </article>
+            <div className="border-t-2 w-full border-black/20">
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <p className="text-xl text-gray-500">Was it helpful?</p>
+                <div className="flex gap-2">
+                  <button onClick={() => handleLikeBlog(dataVar?.blog._id)}>
+                    <ThumbUpOffAltIcon style={{ fontSize: "2rem" }} />
+                    <p>{dataVar?.like}</p>
+                  </button>
+                  <button onClick={() => handleDislikeBlog(data.blog._id)}>
+                    <ThumbDownOffAltIcon style={{ fontSize: "2rem" }} />
+                    <p>{dataVar?.dislike}</p>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
-        <div className="col-span-2"></div>
-      </div>
-
-      <div className="xl:grid block md:grid-cols-12">
-        <div className="hidden md:flex md:col-span-2 flex-col gap-2 w-full padding"></div>
-        <section className="padding flex flex-col gap-4 w-full col-span-8">
-          <div>
-            <span className="my-2 block text-2xl font-semibold">
-              Most Viewed
-            </span>
-            <div className="border-b-2 border-black/10" />
-          </div>
-          <div className="flex gap-8 mt-6 justify-center flex-wrap">
-            <MostViewedCard />
-            <MostViewedCard />
-            <MostViewedCard />
-            <MostViewedCard />
-            <MostViewedCard />
-            <MostViewedCard />
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
+      )}
     </>
   );
 };

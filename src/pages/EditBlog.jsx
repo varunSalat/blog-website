@@ -1,10 +1,13 @@
 import { useState, useRef, useContext, useEffect } from "react";
 import { Btn } from "../components";
 import JoditEditor from "jodit-react";
-import axios from "axios";
 import { UserContext } from "../context/UserContext";
 import Loader from "../layouts/Loader";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { errorToast, successToast } from "../constants/toastMsgs";
+import { listingAPI } from "../apis/axios/blogsAPIs";
+import { apiWithAuth } from "../apis/axios/blogsAPIs";
+import PropTypes from "prop-types";
 
 const Example = ({ onBlur, value }) => {
   const editor = useRef(null);
@@ -20,10 +23,16 @@ const Example = ({ onBlur, value }) => {
   );
 };
 
+Example.propTypes = {
+  onBlur: PropTypes.func,
+  value: PropTypes.string,
+};
+
 const EditBlog = () => {
   const { login, user } = useContext(UserContext);
   const { blogUrl } = useParams();
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState(null);
   const [blog, setBlog] = useState(null);
@@ -31,13 +40,12 @@ const EditBlog = () => {
     username: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8800/api/blog/${blogUrl}`
-        );
+        const response = await listingAPI(`/api/blog/${blogUrl}`);
         setFormData(response.data.blog); // Set the data state with the fetched data
         setBlog(response.data.blog.blog);
         setIsLoading(false); // Set loading state to false when data is available
@@ -48,7 +56,7 @@ const EditBlog = () => {
     };
     fetchData();
   }, [blogUrl]);
-  console.log(formData);
+
   const handleInputChange = (e) => {
     if (e.target.name === "mostViewed") {
       setFormData({ ...formData, [e.target.name]: e.target.checked });
@@ -61,15 +69,16 @@ const EditBlog = () => {
   };
 
   const handleSubmit = async () => {
-    const newBlog = await axios
-      .post(
-        "http://localhost:8800/api/edit",
-        { ...formData, blog: blog },
-        { withCredentials: true }
-      )
-      .catch((err) => console.log(err));
-
-    console.log(newBlog);
+    try {
+      setIsEditing(true);
+      await apiWithAuth.post("/api/edit", { ...formData, blog: blog });
+      setIsEditing(false);
+      successToast("Blog Updated successfully");
+      navigate(`/a/${blogUrl}`);
+    } catch (error) {
+      errorToast(error.message);
+      setIsEditing(false);
+    }
   };
 
   const handleLogin = async () => {
@@ -79,7 +88,6 @@ const EditBlog = () => {
   if (isLoading) {
     return <Loader />;
   }
-  console.log(formData.mostViewed);
 
   if (user === null) {
     return (
@@ -167,7 +175,7 @@ const EditBlog = () => {
             Select your category
           </option>
           <option value="Finance">Finance</option>
-          <option value="News">News</option>
+          <option value="Education">Education</option>
           <option value="Tech">Tech</option>
           <option value="Others">Others</option>
         </select>
@@ -194,7 +202,12 @@ const EditBlog = () => {
         />
       </div>
       <div className="w-full xl:w-[1280px]">
-        <Btn title="Edit Blog" onClick={handleSubmit} />
+        <button
+          className="px-6 py-2 text-md font-semibold border-black/10 border-2 rounded-xl flex flex-row items-center justify-center transition-all duration-300 hover:bg-green-500 hover:text-white"
+          onClick={handleSubmit}
+        >
+          <span>{isEditing ? "Editing" : "Edit Blog"}</span>
+        </button>
       </div>
     </section>
   );
