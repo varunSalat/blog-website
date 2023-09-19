@@ -1,80 +1,154 @@
 import { Btn } from "../components";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
+import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
+import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
+import { useNavigate, useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import parse from "html-react-parser";
+import { UserContext } from "../context/UserContext";
+import Loader from "../layouts/Loader";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { listingAPI } from "../apis/axios/blogsAPIs";
+import { useQuery } from "react-query";
+import { fallbackImg } from "../assets";
+import { apiWithAuth } from "../apis/axios/blogsAPIs";
+import { errorToast, successToast } from "../constants/toastMsgs";
+import toast from "react-hot-toast";
+
+const fetchBlog = (blogUrl) => {
+  return listingAPI(`/api/blog/${blogUrl}`);
+};
 
 const Article = () => {
-  const admin = true;
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+  const { blogUrl } = useParams();
+  const [isImgLoading, setIsImgLoading] = useState(true);
+  const [isImgErr, setIsImgErr] = useState(false);
+
+  const blogRes = useQuery(["blog-detail", blogUrl], () => fetchBlog(blogUrl));
+
+  const { isLoading, data } = blogRes;
+  useEffect(() => {
+    document.title = `Scholarwithtech | blog website | ${data?.data.blog.cat}`;
+    // changing meta description
+    const description = data?.data?.blog?.title.slice(0, 155) || "";
+    const metaDescription = document.createElement("meta");
+    metaDescription.name = "description";
+    metaDescription.content = description;
+  }, [data]);
+
+  // delete blog
+
+  const handleDeleteBlog = async (blogId) => {
+    try {
+      await apiWithAuth.delete(`/api/blog/${blogId}`);
+      navigate("/");
+      successToast("Blog is deleted successfully");
+    } catch (error) {
+      errorToast(error.message);
+    }
+  };
+
+  const handleDeleteConfirmation = () => {
+    const confirmed = window.confirm("Are you sure you want to delete this?");
+
+    if (confirmed) {
+      handleDeleteBlog(data?.data?.blog?._id);
+    } else {
+      toast("Your blog is not deleted", {
+        icon: "😇",
+      });
+    }
+  };
+
+  const handleLikeBlog = async (blogId) => {
+    const res = await axios.post(
+      `https://blog-website-g6cd.onrender.com/api/like/${blogId}`
+    );
+    console.log(res);
+  };
+
+  const handleDislikeBlog = async (blogId) => {
+    const res = await axios.post(
+      `https://blog-website-g6cd.onrender.com/api/dislike/${blogId}`
+    );
+    console.log(res);
+  };
+
+  const dataVar = data?.data?.blog;
+
   return (
-    <div className="grid md:grid-cols-12">
-      <div className="col-span-2"></div>
-      <section className="flex flex-col justify-center items-center gap-4 padding md:col-span-8">
-        <div className="flex flex-col justify-center items-center">
-          <img
-            src="./profile.webp"
-            alt="Profile Pic"
-            className="h-20 rounded-full object-cover"
-          />
-          <h4 className="font-semibold text-base">Hardik Sadhu</h4>
-          <time className="font-light text-sm text-gray-400">JULY 4, 2023</time>
+    <>
+      {isLoading && <Loader />}
+      {!isLoading && (
+        <div className="grid md:grid-cols-12">
+          <div className="col-span-2"></div>
+          <section className="flex flex-col justify-center items-center gap-4 padding md:col-span-8">
+            {/* <div className="flex flex-col justify-center items-center">
+              <img
+                src={data?.data?.img}
+                alt={data?.data?.name}
+                className="h-20 w-20 rounded-full object-cover"
+              />
+              <h4 className="font-semibold text-base">{"test"}</h4>
+              <time className="font-light text-sm text-gray-400">
+                {data?.data?.name}
+              </time>
+            </div> */}
+            {user && (
+              <div className="flex gap-4">
+                <Btn
+                  title={"Edit"}
+                  icon={BorderColorIcon}
+                  onClick={() => navigate(`/e/${data?.data?.blog?.url}`)}
+                />
+                <button
+                  onClick={handleDeleteConfirmation}
+                  className="px-6 py-2 text-md font-semibold border-black/10 border-2 rounded-xl flex flex-row items-center justify-center transition-all duration-300 hover:bg-red-400 hover:text-white"
+                >
+                  <DeleteIcon /> Delete
+                </button>
+              </div>
+            )}
+            <h1 className="text-2xl text-justify md:text-3xl font-bold">
+              {data?.data?.blog?.title}
+            </h1>
+            <h3 className="text-lg font-semibold text-gray-500">
+              {data?.data?.blog?.summary}
+            </h3>
+            <img
+              src={
+                isImgErr || isImgLoading ? fallbackImg : data?.data?.blog?.img
+              }
+              alt={data?.data?.blog?.title}
+              className="object-cover min-h-[200px] w-full rounded-xl border-black/20 border-2"
+              onError={() => setIsImgErr(true)}
+              onLoad={() => setIsImgLoading(false)}
+            />
+            <article className="text-lg text-gray-400 font-medium flex flex-col gap-4">
+              {parse(dataVar?.blog)}
+            </article>
+            {/* <div className="border-t-2 w-full border-black/20">
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <p className="text-xl text-gray-500">Was it helpful?</p>
+                <div className="flex gap-2">
+                  <button onClick={() => handleLikeBlog(dataVar?.blog._id)}>
+                    <ThumbUpOffAltIcon style={{ fontSize: "2rem" }} />
+                    <p>{dataVar?.like}</p>
+                  </button>
+                  <button onClick={() => handleDislikeBlog(data.blog._id)}>
+                    <ThumbDownOffAltIcon style={{ fontSize: "2rem" }} />
+                    <p>{dataVar?.dislike}</p>
+                  </button>
+                </div>
+              </div>
+            </div> */}
+          </section>
         </div>
-        {admin && <Btn title={"Edit"} icon={BorderColorIcon} />}
-        <h1 className="text-2xl text-justify md:text-3xl font-bold">
-          Your most unhappy customers are your greatest source of learning.
-        </h1>
-        <h3 className="text-lg font-semibold text-gray-500">
-          Far far away, behind the word mountains, far from the countries
-          Vokalia and Consonantia, there live the blind texts.
-        </h3>
-        <img
-          src="./ast.jpg"
-          alt=""
-          className="object-cover rounded-xl border-black/20 border-2"
-        />
-        <article className="text-lg text-gray-400 font-medium flex flex-col gap-4">
-          <p>
-            Far far away, behind the word mountains, far from the countries
-            Vokalia and Consonantia, there live the blind texts. Separated they
-            live in Bookmarksgrove right at the coast of the Semantics, a large
-            language ocean.
-          </p>
-          <p>
-            A small river named Duden flows by their place and supplies it with
-            the necessary regelialia. It is a paradisematic country, in which
-            roasted parts of sentences fly into your mouth.
-          </p>
-          <blockquote className="pl-10 italic border-l-2 border-black">
-            The Big Oxmox advised her not to do so, because there were thousands
-            of bad Commas, wild Question Marks and devious Semikoli, but the
-            Little Blind Text didn’t listen. She packed her seven versalia, put
-            her initial into the belt and made herself on the way.
-          </blockquote>
-          <p>
-            Even the all-powerful Pointing has no control about the blind texts
-            it is an almost unorthographic life One day however a small line of
-            blind text by the name of Lorem Ipsum decided to leave for the far
-            World of Grammar.
-          </p>
-          <p>
-            When she reached the first hills of the Italic Mountains, she had a
-            last view back on the skyline of her hometown Bookmarksgrove, the
-            headline of Alphabet Village and the subline of her own road, the
-            Line Lane. Pityful a rethoric question ran over her cheek, then she
-            continued her way.
-          </p>
-          <p>
-            Far far away, behind the word mountains, far from the countries
-            Vokalia and Consonantia, there live the blind texts. Separated they
-            live in Bookmarksgrove right at the coast of the Semantics, a large
-            language ocean.
-          </p>
-          <p>
-            A small river named Duden flows by their place and supplies it with
-            the necessary regelialia. It is a paradisematic country, in which
-            roasted parts of sentences fly into your mouth.
-          </p>
-        </article>
-      </section>
-      <div className="col-span-2"></div>
-    </div>
+      )}
+    </>
   );
 };
 
