@@ -20,6 +20,7 @@ const SideBlog = ({ blogData }) => {
           alt={title.slice(0, 10)}
           className="rounded-xl object-contain"
           onLoad={() => setIsImgLoading(false)}
+          loading="lazy"
           onError={() => setImgErr(true)}
         />
       </figure>

@@ -56,6 +56,7 @@ const List = ({ blogData }) => {
               className="rounded-2xl object-center object-cover aspect-[3/2] border-2 border-black/10"
               onError={() => setImgErr(true)}
               onLoad={() => setIsImgLoading(false)}
+              loading="lazy"
             />
           </div>
         </div>

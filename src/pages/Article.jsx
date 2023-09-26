@@ -122,12 +122,13 @@ const Article = () => {
               src={
                 isImgErr || isImgLoading ? fallbackImg : data?.data?.blog?.img
               }
+              loading="lazy"
               alt={data?.data?.blog?.title}
               className="object-cover min-h-[200px] w-full rounded-xl border-black/20 border-2"
               onError={() => setIsImgErr(true)}
               onLoad={() => setIsImgLoading(false)}
             />
-            <article className="text-lg text-gray-400 font-medium flex flex-col gap-4">
+            <article className="text-lg font-medium flex flex-col gap-4">
               {parse(dataVar?.blog)}
             </article>
             {/* <div className="border-t-2 w-full border-black/20">

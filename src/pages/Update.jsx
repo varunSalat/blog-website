@@ -38,6 +38,7 @@ const Update = () => {
   });
 
   const [isPosting, setIsPosting] = useState(false);
+  const [isLogging, setIsLogging] = useState(false);
 
   const handleInputChange = (e) => {
     if (e.target.name === "title") {
@@ -80,7 +81,15 @@ const Update = () => {
   };
 
   const handleLogin = async () => {
-    await login(loginData);
+    setIsLogging(true);
+    try {
+      await login(loginData);
+      successToast("Login Successful");
+    } catch (err) {
+      errorToast(err.message);
+    } finally {
+      setIsLogging(false);
+    }
   };
 
   if (user === null) {
@@ -116,7 +125,7 @@ const Update = () => {
           />
         </div>
         <div className="flex flex-col items-start">
-          <Btn title={"Login"} onClick={handleLogin} />
+          <Btn title={isLogging ? "Logging" : "Login"} onClick={handleLogin} />
         </div>
       </section>
     );

@@ -1,17 +1,21 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import Sbtn from "./Sbtn";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import qs from "query-string";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import { logo } from "../assets";
+import { UserContext } from "../context/UserContext";
 
 const Navbar = () => {
   const [search, setSearch] = useState("");
   const [navOpen, setNavOpen] = useState(false);
   const router = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const { user } = useContext(UserContext);
+  console.log(user);
 
   const handleSearch = useCallback(
     (e) => {
@@ -65,6 +69,11 @@ const Navbar = () => {
     document.querySelector("body").style.overflowY = "scroll";
   });
 
+  const handleLogout = () => {
+    localStorage.setItem("user", null);
+    router("/update");
+  };
+
   return (
     <header className="w-full border-b-[1px] border-black/10 padding max-h-18 bg-primary">
       <nav className="flex flex-row items-center justify-between gap-2 w-full">
@@ -96,6 +105,14 @@ const Navbar = () => {
           <Sbtn title={"Education"} />
           <Sbtn title={"Tech"} />
           <Sbtn title={"Others"} />
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="border-2 border-red-500 px-4 py-1 rounded-xl transition-all duration-[0.4s] hover:bg-red-400"
+            >
+              Logout
+            </button>
+          )}
         </div>
 
         {navOpen && (

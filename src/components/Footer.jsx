@@ -2,8 +2,11 @@ import { Link } from "react-router-dom";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import { UserContext } from "../context/UserContext";
+import { useContext } from "react";
 
 const Footer = () => {
+  const { scrollToTop } = useContext(UserContext);
   return (
     <footer className="padding mt-4 border-primary bg-primary border-t-4 flex flex-col justify-center items-center gap-4">
       <div className="flex flex-row gap-4 items-center justify-center">
@@ -26,12 +29,14 @@ const Footer = () => {
       <div className="flex flex-row gap-4 items-center justify-center">
         <Link
           to={"/term-condition"}
+          onClick={scrollToTop}
           className="text-gray-200 transition-all duration-300 hover:text-white"
         >
           Terms of Use
         </Link>
         <Link
           to={"/privacy-policy"}
+          onClick={scrollToTop}
           className="text-gray-200 transition-all duration-300 hover:text-white"
         >
           Privacy Policy

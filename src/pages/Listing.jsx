@@ -5,6 +5,7 @@ import Loader from "../layouts/Loader";
 import NoBlogFound from "../layouts/NoBlogFound";
 import { useQuery } from "react-query";
 import { useEffect } from "react";
+import { listingAPI } from "../apis/axios/blogsAPIs";
 
 // FUNCTIONS
 const fetchFunc = async (searchParams) => {
@@ -28,10 +29,8 @@ const fetchFunc = async (searchParams) => {
   } else {
     delete query.cat;
   }
-  const response = await axios.post(
-    "https://blog-website-g6cd.onrender.com/api/blog",
-    query
-  );
+  // const response = await axios.post("http://localhost:8800/api/blog", query);
+  const response = await listingAPI.post("/api/blog", query);
   return response.data;
 };
 
