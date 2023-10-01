@@ -15,7 +15,6 @@ const Navbar = () => {
   const [searchParams] = useSearchParams();
 
   const { user } = useContext(UserContext);
-  console.log(user);
 
   const handleSearch = useCallback(
     (e) => {
@@ -128,6 +127,14 @@ const Navbar = () => {
               <Sbtn title={"Education"} setNavOpen={setNavOpen} />
               <Sbtn title={"Tech"} setNavOpen={setNavOpen} />
               <Sbtn title={"Others"} setNavOpen={setNavOpen} />
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="border-2 border-red-500 px-4 py-1 rounded-xl transition-all duration-[0.4s] hover:bg-red-400"
+                >
+                  Logout
+                </button>
+              )}
             </div>
 
             <div className="flex-2 relative w-[90%] ml-[5%] mt-4">

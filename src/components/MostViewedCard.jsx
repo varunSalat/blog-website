@@ -19,6 +19,7 @@ const MostViewedCard = ({ blogData }) => {
           className="rounded-md h-[250px] object-cover w-full"
           onLoad={() => setIsImgLoading(false)}
           onError={() => setImgErr(true)}
+          loading="lazy"
         />
       </figure>
       <h1

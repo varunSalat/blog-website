@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState, useEffect, createContext } from "react";
 export const UserContext = createContext();
 import PropTypes from "prop-types";
@@ -13,24 +12,24 @@ export const UserProvider = ({ children }) => {
     children: PropTypes.object,
   };
 
-  // const login = async (i) => {
-  //   try {
-  //     const res = await apiWithAuth.post("/api/login", i);
-  //     setUser(res.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
   const login = async (i) => {
-    const res = await axios.post(
-      "https://blog-website-g6cd.onrender.com/api/login",
-      i,
-      {
-        withCredentials: true,
-      }
-    );
-    setUser(res.data);
+    try {
+      const res = await apiWithAuth.post("/api/login", i);
+      setUser(res.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
+  // const login = async (i) => {
+  //   const res = await axios.post(
+  //     "https://blog-website-g6cd.onrender.com/api/login",
+  //     i,
+  //     {
+  //       withCredentials: true,
+  //     }
+  //   );
+  //   setUser(res.data);
+  // };
 
   const logout = () => {
     localStorage.removeItem("user");

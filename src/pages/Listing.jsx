@@ -1,4 +1,3 @@
-import axios from "axios";
 import { List, Pagination, SideBlog, MostViewedCard } from "../components";
 import { useSearchParams } from "react-router-dom";
 import Loader from "../layouts/Loader";
@@ -29,9 +28,12 @@ const fetchFunc = async (searchParams) => {
   } else {
     delete query.cat;
   }
-  // const response = await axios.post("http://localhost:8800/api/blog", query);
   const response = await listingAPI.post("/api/blog", query);
   return response.data;
+};
+
+const mostViewedBlogFetch = async () => {
+  return await listingAPI.get("/api/mostBlog");
 };
 
 const Listing = () => {
@@ -43,18 +45,26 @@ const Listing = () => {
     ["blog-list", searchParams.toString()],
     () => fetchFunc(searchParams),
     {
-      cacheTime: 10000 * 60000,
+      cacheTime: 100000 * 600000,
     }
   );
   const totalBlogs = res?.data?.totalCount;
+
+  const mostViewedBlogRes = useQuery("most-viewed", mostViewedBlogFetch, {
+    cacheTime: 100000 * 600000,
+  });
+  console.log(mostViewedBlogRes?.data?.data);
 
   useEffect(() => {
     document.title = "Scholarwithtech | blog website | Information blog";
   }, []);
 
+  if (res?.isLoading || mostViewedBlogRes?.isLoading) {
+    return <Loader />;
+  }
+
   return (
     <>
-      {res?.isLoading && <Loader />}
       <div className="grid xl:grid-cols-12">
         <div className="hidden md:flex md:col-span-2 flex-col gap-2 w-full padding"></div>
         <section className="padding flex flex-col gap-4 w-full col-span-8">
@@ -76,7 +86,7 @@ const Listing = () => {
               Most Viewed
             </span>
           </div>
-          {res?.data?.most.map((blogData) => (
+          {mostViewedBlogRes?.data?.data.map((blogData) => (
             <SideBlog key={blogData._id} blogData={blogData} />
           ))}
         </div>
@@ -92,9 +102,9 @@ const Listing = () => {
             <div className="border-b-2 border-black/10" />
           </div>
           <div className="flex gap-8 mt-6 justify-center flex-wrap">
-            {res?.data?.most.map((blogData) => (
+            {/* {res?.data?.most.map((blogData) => (
               <MostViewedCard key={blogData._id} blogData={blogData} />
-            ))}
+            ))} */}
           </div>
         </section>
       </div>

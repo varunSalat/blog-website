@@ -15,16 +15,6 @@ const List = ({ blogData }) => {
   return (
     <>
       <article className="flex flex-col gap-4 justify-start">
-        {/* <div className="flex flex-row items-center justify-start gap-2">
-          <img
-            src={author.img}
-            alt={author.name}
-            className="h-8 w-8 rounded-full object-cover"
-          />
-          <span className="font-medium text-md">{name}</span>
-          <span>•</span>
-          <p className="font-medium text-sm text-gray-500">{author.name}</p>
-        </div> */}
         <div className="lg:grid grid-cols-10 flex flex-col-reverse sm:gap-6 md:gap-8 items-start justify-start">
           <div className="col-span-7 flex flex-col gap-6">
             <div>

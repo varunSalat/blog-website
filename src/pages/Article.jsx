@@ -63,92 +63,53 @@ const Article = () => {
     }
   };
 
-  const handleLikeBlog = async (blogId) => {
-    const res = await axios.post(
-      `https://blog-website-g6cd.onrender.com/api/like/${blogId}`
-    );
-    console.log(res);
-  };
-
-  const handleDislikeBlog = async (blogId) => {
-    const res = await axios.post(
-      `https://blog-website-g6cd.onrender.com/api/dislike/${blogId}`
-    );
-    console.log(res);
-  };
-
   const dataVar = data?.data?.blog;
 
+  // *LOADING PAGE
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  // *ARTICLE PAGE
   return (
     <>
-      {isLoading && <Loader />}
-      {!isLoading && (
-        <div className="grid md:grid-cols-12">
-          <div className="col-span-2"></div>
-          <section className="flex flex-col justify-center items-center gap-4 padding md:col-span-8">
-            {/* <div className="flex flex-col justify-center items-center">
-              <img
-                src={data?.data?.img}
-                alt={data?.data?.name}
-                className="h-20 w-20 rounded-full object-cover"
+      <div className="grid md:grid-cols-12">
+        <div className="col-span-2"></div>
+        <section className="flex flex-col justify-center items-center gap-4 padding md:col-span-8">
+          {user && (
+            <div className="flex gap-4">
+              <Btn
+                title={"Edit"}
+                icon={BorderColorIcon}
+                onClick={() => navigate(`/e/${data?.data?.blog?.url}`)}
               />
-              <h4 className="font-semibold text-base">{"test"}</h4>
-              <time className="font-light text-sm text-gray-400">
-                {data?.data?.name}
-              </time>
-            </div> */}
-            {user && (
-              <div className="flex gap-4">
-                <Btn
-                  title={"Edit"}
-                  icon={BorderColorIcon}
-                  onClick={() => navigate(`/e/${data?.data?.blog?.url}`)}
-                />
-                <button
-                  onClick={handleDeleteConfirmation}
-                  className="px-6 py-2 text-md font-semibold border-black/10 border-2 rounded-xl flex flex-row items-center justify-center transition-all duration-300 hover:bg-red-400 hover:text-white"
-                >
-                  <DeleteIcon /> Delete
-                </button>
-              </div>
-            )}
-            <h1 className="text-2xl text-justify md:text-3xl font-bold">
-              {data?.data?.blog?.title}
-            </h1>
-            <h3 className="text-lg font-semibold text-gray-500">
-              {data?.data?.blog?.summary}
-            </h3>
-            <img
-              src={
-                isImgErr || isImgLoading ? fallbackImg : data?.data?.blog?.img
-              }
-              loading="lazy"
-              alt={data?.data?.blog?.title}
-              className="object-cover min-h-[200px] w-full rounded-xl border-black/20 border-2"
-              onError={() => setIsImgErr(true)}
-              onLoad={() => setIsImgLoading(false)}
-            />
-            <article className="text-lg font-medium flex flex-col gap-4">
-              {parse(dataVar?.blog)}
-            </article>
-            {/* <div className="border-t-2 w-full border-black/20">
-              <div className="flex justify-center items-center gap-4 mt-6">
-                <p className="text-xl text-gray-500">Was it helpful?</p>
-                <div className="flex gap-2">
-                  <button onClick={() => handleLikeBlog(dataVar?.blog._id)}>
-                    <ThumbUpOffAltIcon style={{ fontSize: "2rem" }} />
-                    <p>{dataVar?.like}</p>
-                  </button>
-                  <button onClick={() => handleDislikeBlog(data.blog._id)}>
-                    <ThumbDownOffAltIcon style={{ fontSize: "2rem" }} />
-                    <p>{dataVar?.dislike}</p>
-                  </button>
-                </div>
-              </div>
-            </div> */}
-          </section>
-        </div>
-      )}
+              <button
+                onClick={handleDeleteConfirmation}
+                className="px-6 py-2 text-md font-semibold border-black/10 border-2 rounded-xl flex flex-row items-center justify-center transition-all duration-300 hover:bg-red-400 hover:text-white"
+              >
+                <DeleteIcon /> Delete
+              </button>
+            </div>
+          )}
+          <h1 className="text-2xl text-justify md:text-3xl font-bold">
+            {data?.data?.blog?.title}
+          </h1>
+          <h3 className="text-lg font-semibold text-gray-500">
+            {data?.data?.blog?.summary}
+          </h3>
+          <img
+            src={isImgErr || isImgLoading ? fallbackImg : data?.data?.blog?.img}
+            loading="lazy"
+            alt={data?.data?.blog?.title}
+            className="object-cover min-h-[200px] w-full rounded-xl border-black/20 border-2"
+            onError={() => setIsImgErr(true)}
+            onLoad={() => setIsImgLoading(false)}
+          />
+          <article className="text-lg font-medium flex flex-col gap-4">
+            {parse(dataVar?.blog)}
+          </article>
+        </section>
+      </div>
     </>
   );
 };

@@ -1,9 +1,16 @@
+import { Suspense, lazy } from "react";
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
+// pages
 import { Footer, Navbar } from "./components";
-import { Listing, Article, Update, EditBlog } from "./pages";
+const Listing = lazy(() => import("./pages/Listing"));
+const Article = lazy(() => import("./pages/Article"));
+const Update = lazy(() => import("./pages/Update"));
+const EditBlog = lazy(() => import("./pages/EditBlog"));
+
 import ScrollToTopButton from "./components/ScrollTopBtn";
-import TermsCondition from "./pages/TermsCondition";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
+const TermsCondition = lazy(() => import("./pages/TermsCondition"));
+import Loader from "./layouts/Loader";
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 // outlet setup
 
@@ -11,7 +18,9 @@ const Layout = (
   <main>
     <Navbar />
     <ScrollToTopButton />
-    <Outlet />
+    <Suspense fallback={<Loader />}>
+      <Outlet />
+    </Suspense>
     <Footer />
   </main>
 );
