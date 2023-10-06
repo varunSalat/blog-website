@@ -106,7 +106,7 @@ const Article = () => {
             onLoad={() => setIsImgLoading(false)}
           />
           <article className="text-lg font-medium flex flex-col gap-4">
-            {parse(dataVar?.blog)}
+            {parse(data?.data?.blog?.blog)}
           </article>
         </section>
       </div>

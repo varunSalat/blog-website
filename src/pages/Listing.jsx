@@ -45,21 +45,20 @@ const Listing = () => {
     ["blog-list", searchParams.toString()],
     () => fetchFunc(searchParams),
     {
-      cacheTime: 100000 * 600000,
+      cacheTime: 10000 * 60000,
     }
   );
   const totalBlogs = res?.data?.totalCount;
 
   const mostViewedBlogRes = useQuery("most-viewed", mostViewedBlogFetch, {
-    cacheTime: 100000 * 600000,
+    cacheTime: 10000 * 60000,
   });
-  console.log(mostViewedBlogRes?.data?.data);
 
   useEffect(() => {
     document.title = "Scholarwithtech | blog website | Information blog";
   }, []);
 
-  if (res?.isLoading || mostViewedBlogRes?.isLoading) {
+  if (res?.isLoading) {
     return <Loader />;
   }
 
